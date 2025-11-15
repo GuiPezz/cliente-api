@@ -1,162 +1,197 @@
-const BASE_URL = 'http://localhost:8080/api/clientes'; 
+// ========================
+//      CONFIGURAÇÃO
+// ========================
+const BASE_CLIENTES = "http://localhost:8080/api/clientes";
+const BASE_AGENDAMENTOS = "http://localhost:8080/api/agendamentos";
+
 const tabelaBody = document.getElementById('tabela-clientes-body');
-const formCliente = document.getElementById('form-cliente');
 
-// --- Funções de Formatação ---
-function formatarData(isoString) {
-    if (!isoString) return 'N/A';
-    // O ISO string do Java (ex: 2025-11-08T15:46:12.123)
-    const data = new Date(isoString);
-    return data.toLocaleDateString('pt-BR') + ' ' + data.toLocaleTimeString('pt-BR');
+
+// ========================
+//      UTILITÁRIOS
+// ========================
+function formatarData(iso) {
+    if (!iso) return "";
+    const data = new Date(iso);
+    return data.toLocaleDateString("pt-BR") + " " + data.toLocaleTimeString("pt-BR");
 }
 
-// --- Funções de Comunicação com a API ---
 
-// GET - Listar todos os clientes
+// ========================
+//   CRUD DE CLIENTES
+// ========================
+
+// Listar clientes
 async function listarClientes() {
-    try {
-        const response = await fetch(BASE_URL);
-        if (!response.ok) {
-            throw new Error(`Erro HTTP: ${response.status}`);
-        }
-        const clientes = await response.json();
-        renderizarClientes(clientes);
-    } catch (error) {
-        console.error('Erro ao listar clientes:', error);
-        alert('Falha ao carregar a lista de clientes. Verifique se a API está rodando na porta 8080.');
-    }
+    const res = await fetch(BASE_CLIENTES);
+    const clientes = await res.json();
+    renderizarClientes(clientes);
+    carregarClientesSelect();
 }
 
-// POST e PUT - Lógica de Submissão do Formulário
-formCliente.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const id = document.getElementById('cliente-id').value;
-    const clienteData = {
-        nome: document.getElementById('nome').value,
-        email: document.getElementById('email').value,
-        telefone: document.getElementById('telefone').value,
-        observacoes: document.getElementById('observacoes').value
-    };
-
-    if (id) {
-        // Se há ID, é uma atualização (PUT)
-        await atualizarCliente(id, clienteData);
-    } else {
-        // Se não há ID, é um novo cadastro (POST)
-        await criarCliente(clienteData);
-    }
-    
-    formCliente.reset(); // Limpa o formulário
-    document.getElementById('cliente-id').value = ''; // Remove o ID escondido
-    document.getElementById('btn-salvar').textContent = 'Salvar Cliente'; // Reseta o texto do botão
-    listarClientes(); // Recarrega a lista
-});
-
-// POST - Criar novo cliente
+// Criar cliente
 async function criarCliente(data) {
-    try {
-        const response = await fetch(BASE_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        if (response.status === 422) { // Erro de validação da API
-            const validationErrors = await response.json();
-            alert('Erro de Validação: ' + JSON.stringify(validationErrors));
-        } else if (!response.ok) {
-             throw new Error(`Falha ao criar cliente. Código: ${response.status}`);
-        }
-        alert('Cliente cadastrado com sucesso!');
-    } catch (error) {
-        console.error('Erro ao criar cliente:', error);
-        alert(error.message);
-    }
+    await fetch(BASE_CLIENTES, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+    alert("Cliente criado com sucesso!");
 }
 
-// PUT - Atualizar cliente
+// Atualizar cliente
 async function atualizarCliente(id, data) {
-    try {
-        const response = await fetch(`${BASE_URL}/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        if (response.status === 404) {
-            alert('Erro: Cliente não encontrado para atualização.');
-        } else if (!response.ok) {
-             throw new Error(`Falha ao atualizar cliente. Código: ${response.status}`);
-        }
-        alert('Cliente atualizado com sucesso!');
-    } catch (error) {
-        console.error('Erro ao atualizar cliente:', error);
-        alert(error.message);
-    }
+    await fetch(`${BASE_CLIENTES}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+    alert("Cliente atualizado!");
 }
 
-// DELETE - Remover cliente
+// Deletar cliente
 async function deletarCliente(id) {
-    if (!confirm('Tem certeza que deseja DELETAR este cliente? Esta ação é irreversível.')) return;
-    try {
-        const response = await fetch(`${BASE_URL}/${id}`, {
-            method: 'DELETE'
-        });
-        if (response.status === 404) {
-            alert('Erro: Cliente não encontrado para exclusão.');
-        } else if (!response.ok && response.status !== 204) { // 204 No Content é o esperado para DELETE bem-sucedido
-             throw new Error(`Falha ao deletar cliente. Código: ${response.status}`);
-        }
-        alert('Cliente deletado com sucesso!');
-        listarClientes(); // Recarrega a lista
-    } catch (error) {
-        console.error('Erro ao deletar cliente:', error);
-        alert(error.message);
-    }
+    if (!confirm("Tem certeza que deseja deletar?")) return;
+
+    await fetch(`${BASE_CLIENTES}/${id}`, { method: "DELETE" });
+    alert("Cliente removido!");
+    listarClientes();
 }
 
-// --- Funções de Renderização da Tabela ---
 
-// Preenche o formulário para edição (baseado no GET {id})
-function preencherFormulario(cliente) {
-    document.getElementById('cliente-id').value = cliente.id;
-    document.getElementById('nome').value = cliente.nome;
-    document.getElementById('email').value = cliente.email;
-    document.getElementById('telefone').value = cliente.telefone;
-    document.getElementById('observacoes').value = cliente.observacoes;
-    document.getElementById('btn-salvar').textContent = 'Atualizar Cliente';
-    window.scrollTo(0, 0); // Leva o usuário de volta ao formulário
-}
-
-// Renderiza a lista de clientes na tabela
+// Renderizar tabela de clientes
 function renderizarClientes(clientes) {
-    tabelaBody.innerHTML = ''; // Limpa a tabela
-    if (clientes.length === 0) {
-        tabelaBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum cliente cadastrado.</td></tr>';
-        return;
-    }
+    tabelaBody.innerHTML = "";
 
-    clientes.forEach(cliente => {
-        const linha = tabelaBody.insertRow();
-        linha.insertCell(0).textContent = cliente.id;
-        linha.insertCell(1).textContent = cliente.nome;
-        linha.insertCell(2).textContent = cliente.email;
-        linha.insertCell(3).textContent = formatarData(cliente.dataCadastro);
-        
-        const celulaAcoes = linha.insertCell(4);
-        
-        const btnEditar = document.createElement('button');
-        btnEditar.textContent = 'Editar';
-        btnEditar.className = 'btn-editar';
-        btnEditar.onclick = () => preencherFormulario(cliente); 
-        celulaAcoes.appendChild(btnEditar);
-
-        const btnDeletar = document.createElement('button');
-        btnDeletar.textContent = 'Deletar';
-        btnDeletar.className = 'btn-deletar';
-        btnDeletar.onclick = () => deletarCliente(cliente.id); 
-        celulaAcoes.appendChild(btnDeletar);
+    clientes.forEach(c => {
+        let linha = `
+            <tr>
+                <td>${c.id}</td>
+                <td>${c.nome}</td>
+                <td>${c.email}</td>
+                <td>${formatarData(c.dataCadastro)}</td>
+                <td>
+                    <button class='btn-editar' onclick='preencherFormulario(${JSON.stringify(JSON.stringify(c))})'>Editar</button>
+                    <button class='btn-deletar' onclick='deletarCliente(${c.id})'>Deletar</button>
+                </td>
+            </tr>
+        `;
+        linha = linha.replace(/\"/g, "'");
+        tabelaBody.innerHTML += linha;
     });
 }
 
-// Inicializa a aplicação ao carregar a página
-document.addEventListener('DOMContentLoaded', listarClientes);
+// Preencher formulário cliente
+function preencherFormulario(clienteStr) {
+    const cliente = JSON.parse(clienteStr);
+
+    document.getElementById("cliente-id").value = cliente.id;
+    document.getElementById("nome").value = cliente.nome;
+    document.getElementById("email").value = cliente.email;
+    document.getElementById("telefone").value = cliente.telefone;
+    document.getElementById("observacoes").value = cliente.observacoes;
+
+    document.getElementById("btn-salvar").textContent = "Atualizar Cliente";
+}
+
+
+// Enviar formulário cliente
+document.getElementById("form-cliente").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById("cliente-id").value;
+
+    const data = {
+        nome: nome.value,
+        email: email.value,
+        telefone: telefone.value,
+        observacoes: observacoes.value
+    };
+
+    if (id) await atualizarCliente(id, data);
+    else await criarCliente(data);
+
+    formCliente.reset();
+    listarClientes();
+});
+
+
+
+// ==============================
+//        CRUD AGENDAMENTOS
+// ==============================
+
+// Preencher select com clientes
+async function carregarClientesSelect() {
+    const res = await fetch(BASE_CLIENTES);
+    const clientes = await res.json();
+
+    const select = document.getElementById("ag-cliente");
+    select.innerHTML = "";
+
+    clientes.forEach(c => {
+        select.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+    });
+}
+
+
+// Criar agendamento
+async function criarAgendamento() {
+    const dto = {
+        clienteId: document.getElementById("ag-cliente").value,
+        dataHora: document.getElementById("ag-dataHora").value,
+        servico: document.getElementById("ag-servico").value,
+        observacoes: document.getElementById("ag-observacoes").value
+    };
+
+    await fetch(BASE_AGENDAMENTOS, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dto)
+    });
+
+    alert("Agendamento criado!");
+    listarAgendamentos();
+}
+
+// Listar agendamentos
+async function listarAgendamentos() {
+    const res = await fetch(BASE_AGENDAMENTOS);
+    const lista = await res.json();
+
+    const tabela = document.getElementById("agendamentos-table");
+    tabela.innerHTML = "";
+
+    lista.forEach(a => {
+        tabela.innerHTML += `
+            <tr>
+                <td>${a.id}</td>
+                <td>${a.cliente.nome}</td>
+                <td>${a.dataHora.replace("T", " ")}</td>
+                <td>${a.servico}</td>
+                <td>${a.observacoes || ""}</td>
+                <td><button class='btn-deletar' onclick='deletarAgendamento(${a.id})'>Excluir</button></td>
+            </tr>
+        `;
+    });
+}
+
+// Deletar agendamento
+async function deletarAgendamento(id) {
+    if (!confirm("Confirmar exclusão?")) return;
+
+    await fetch(`${BASE_AGENDAMENTOS}/${id}`, { method: "DELETE" });
+
+    alert("Agendamento removido!");
+    listarAgendamentos();
+}
+
+
+// ===============================
+//      INICIALIZAÇÃO DA PÁGINA
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+    listarClientes();
+    listarAgendamentos();
+    carregarClientesSelect();
+});
