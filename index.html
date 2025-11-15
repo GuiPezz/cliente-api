@@ -2,63 +2,133 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciamento de Clientes (Frontend)</title>
-    <link rel="stylesheet" href="style.css"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gerenciamento de Clientes e Agendamentos</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <header>
-        <h1>Cliente API - Empresa de Serviços</h1>
-    </header>
 
-    <main>
-        <section class="form-section">
-            <h2>Cadastrar/Editar Cliente</h2>
-            <form id="form-cliente">
-                <input type="hidden" id="cliente-id">
-                
-                <div class="input-group">
-                    <label for="nome">Nome:</label>
-                    <input type="text" id="nome" placeholder="Nome completo" required maxlength="120">
-                </div>
-                
-                <div class="input-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" placeholder="email@exemplo.com" required maxlength="150">
-                </div>
+<header>
+    <h1>Cliente API - Empresa de Serviços</h1>
+</header>
 
-                <div class="input-group">
-                    <label for="telefone">Telefone:</label>
-                    <input type="text" id="telefone" placeholder="(XX) XXXX-XXXX" required maxlength="20">
-                </div>
+<main>
 
-                <div class="input-group">
-                    <label for="observacoes">Observações:</label>
-                    <textarea id="observacoes" placeholder="Notas sobre o cliente" maxlength="255"></textarea>
-                </div>
+    <!-- =========================== -->
+    <!--      FORMULÁRIO CLIENTE     -->
+    <!-- =========================== -->
+    <section class="form-section">
+        <h2>Cadastrar / Editar Cliente</h2>
 
-                <button type="submit" id="btn-salvar">Salvar Cliente</button>
-            </form>
-        </section>
+        <form id="form-cliente">
+            <input type="hidden" id="cliente-id">
 
-        <section class="list-section">
-            <h2>Lista de Clientes</h2>
-            <table id="tabela-clientes-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Email</th>
-                        <th>Cadastro</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabela-clientes-body">
-                    </tbody>
-            </table>
-        </section>
-    </main>
-    
-    <script src="app.js"></script>
+            <div class="input-group">
+                <label>Nome:</label>
+                <input type="text" id="nome" maxlength="120" required>
+            </div>
+
+            <div class="input-group">
+                <label>Email:</label>
+                <input type="email" id="email" maxlength="150" required>
+            </div>
+
+            <div class="input-group">
+                <label>Telefone:</label>
+                <input type="text" id="telefone" maxlength="20" required>
+            </div>
+
+            <div class="input-group">
+                <label>Observações:</label>
+                <textarea id="observacoes" maxlength="255"></textarea>
+            </div>
+
+            <button id="btn-salvar" type="submit">Salvar Cliente</button>
+        </form>
+    </section>
+
+    <!-- =========================== -->
+    <!--      LISTA DE CLIENTES      -->
+    <!-- =========================== -->
+    <section class="list-section">
+        <h2>Lista de Clientes</h2>
+
+        <table id="tabela-clientes-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Cadastro</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+
+            <tbody id="tabela-clientes-body"></tbody>
+        </table>
+    </section>
+
+    <hr><br>
+
+    <!-- =========================== -->
+    <!--   FORMULÁRIO AGENDAMENTO    -->
+    <!-- =========================== -->
+    <section class="form-section">
+        <h2>Agendar Serviço</h2>
+
+        <form id="form-agendamento">
+
+            <div class="input-group">
+                <label>Cliente:</label>
+                <select id="ag-cliente" required></select>
+            </div>
+
+            <div class="input-group">
+                <label>Data e Hora:</label>
+                <input type="datetime-local" id="ag-dataHora" required>
+            </div>
+
+            <div class="input-group">
+                <label>Serviço:</label>
+                <input type="text" id="ag-servico" required>
+            </div>
+
+            <div class="input-group">
+                <label>Observações:</label>
+                <textarea id="ag-observacoes"></textarea>
+            </div>
+
+            <button type="button" class="btn-salvar" onclick="criarAgendamento()">
+                Salvar Agendamento
+            </button>
+        </form>
+    </section>
+
+    <!-- =========================== -->
+    <!--   LISTA DE AGENDAMENTOS     -->
+    <!-- =========================== -->
+    <section class="list-section">
+        <h2>Lista de Agendamentos</h2>
+
+        <table id="tabela-agendamentos">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Data/Hora</th>
+                    <th>Serviço</th>
+                    <th>Observações</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+
+            <tbody id="agendamentos-table"></tbody>
+        </table>
+    </section>
+
+</main>
+
+<script src="app.js"></script>
 </body>
 </html>
