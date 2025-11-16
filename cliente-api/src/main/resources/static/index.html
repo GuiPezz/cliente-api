@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+	    <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <title>Cliente API</title>
+	    <link rel="stylesheet" href="style.css">
+	</head>
+
+<body>
+
+<header>
+    <h1>Cliente API - Empresa de Serviços</h1>
+</header>
+
+<main>
+
+    <section class="form-section">
+        <h2>Cadastrar/Editar Cliente</h2>
+
+        <form id="form-cliente">
+            <input type="hidden" id="cliente-id">
+
+            <div class="input-group">
+                <label>Nome:</label>
+                <input type="text" id="nome" required>
+            </div>
+
+            <div class="input-group">
+                <label>Email:</label>
+                <input type="email" id="email" required>
+            </div>
+
+            <div class="input-group">
+                <label>Telefone:</label>
+                <input type="text" id="telefone" required>
+            </div>
+
+            <div class="input-group">
+                <label>Observações:</label>
+                <textarea id="observacoes"></textarea>
+            </div>
+
+            <button type="submit" id="btn-salvar">Salvar Cliente</button>
+        </form>
+    </section>
+
+
+    <section class="list-section">
+        <h2>Lista de Clientes</h2>
+
+        <table id="tabela-clientes-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Cadastro</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-clientes-body"></tbody>
+        </table>
+    </section>
+
+
+    <section class="form-section">
+        <h2>Agendar Serviço</h2>
+
+        <div class="input-group">
+            <label>Cliente:</label>
+            <select id="ag-cliente"></select>
+        </div>
+
+        <div class="input-group">
+            <label>Data e Hora:</label>
+            <input type="datetime-local" id="ag-dataHora">
+        </div>
+
+        <div class="input-group">
+            <label>Serviço:</label>
+            <input type="text" id="ag-servico">
+        </div>
+
+        <div class="input-group">
+            <label>Observações:</label>
+            <textarea id="ag-observacoes"></textarea>
+        </div>
+
+        <button id="btn-agendar" type="button">Salvar Agendamento</button>
+    </section>
+
+
+    <section class="list-section">
+        <h2>Lista de Agendamentos</h2>
+
+        <table id="tabela-agendamentos-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Data/Hora</th>
+                    <th>Serviço</th>
+                    <th>Observações</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+
+            <tbody id="agendamentos-table"></tbody>
+        </table>
+    </section>
+
+</main>
+
+<script src="app.js" defer></script>
+
+</body>
+</html>
